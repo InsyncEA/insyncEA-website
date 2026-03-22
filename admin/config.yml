@@ -1,0 +1,57 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "blog"
+    label: "Blog Posts"
+    folder: "_posts"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - label: "Title"
+        name: "title"
+        widget: "string"
+      - label: "Publish Date"
+        name: "date"
+        widget: "datetime"
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options:
+          - "Executive Assistant Tips"
+          - "Calendar Strategy"
+          - "Operations"
+          - "Travel"
+          - "Hiring"
+          - "Tools"
+          - "Mindset"
+          - "Productivity"
+      - label: "Featured Image"
+        name: "thumbnail"
+        widget: "image"
+        required: false
+      - label: "Short Description"
+        name: "excerpt"
+        widget: "text"
+      - label: "Blog Content"
+        name: "body"
+        widget: "markdown"
+      - label: "SEO Description"
+        name: "seo_description"
+        widget: "text"
+        required: false
+```
+
+4. Click **Commit new file**
+
+**Step 4 — Verify**
+
+Go back to your repository home. You should now see an `admin` folder. Click it — you should see both `index.html` and `config.yml` inside.
+
+**Step 5 — Wait 2 minutes** then go to:
+```
+insyncea1.netlify.app/admin
