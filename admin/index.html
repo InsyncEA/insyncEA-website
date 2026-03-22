@@ -7,21 +7,6 @@
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <script>
-    if (window.location.hostname !== 'localhost') {
-      window.netlifyIdentity = window.netlifyIdentity || {};
-      window.netlifyIdentity.on = window.netlifyIdentity.on || function(){};
-    }
-  </script>
   <script src="https://cdn.jsdelivr.net/npm/netlify-cms@2.10.192/dist/netlify-cms.js"></script>
 </body>
 </html>
-```
-
-5. Click **Commit changes**
-
-**Step 2 — Wait 1 minute** for Cloudflare to redeploy
-
-**Step 3 — Go to your site**
-```
-https://insyncea-website.wendymutheo16.workers.dev
