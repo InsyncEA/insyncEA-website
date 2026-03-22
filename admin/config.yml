@@ -30,10 +30,6 @@ collections:
           - "Tools"
           - "Mindset"
           - "Productivity"
-      - label: "Featured Image"
-        name: "thumbnail"
-        widget: "image"
-        required: false
       - label: "Short Description"
         name: "excerpt"
         widget: "text"
@@ -44,14 +40,3 @@ collections:
         name: "seo_description"
         widget: "text"
         required: false
-```
-
-4. Click **Commit new file**
-
-**Step 4 — Verify**
-
-Go back to your repository home. You should now see an `admin` folder. Click it — you should see both `index.html` and `config.yml` inside.
-
-**Step 5 — Wait 2 minutes** then go to:
-```
-insyncea1.netlify.app/admin
