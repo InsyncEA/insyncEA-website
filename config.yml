@@ -2,21 +2,47 @@ backend:
   name: git-gateway
   branch: main
 
-media_folder: "images/uploads"
-public_folder: "/images/uploads"
+locale: en
+
+media_folder: images/uploads
+public_folder: /images/uploads
 
 collections:
-  - name: "blog"
-    label: "Blog Posts"
-    folder: "_posts"
+  - name: blog
+    label: Blog Posts
+    folder: _posts
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
-      - {label: "Title", name: "title", widget: "string", hint: "The title of your blog post"}
-      - {label: "Publish Date", name: "date", widget: "datetime"}
-      - {label: "Category", name: "category", widget: "select", options: ["Executive Assistant Tips", "Calendar Strategy", "Fundraising", "Operations", "Travel", "Hiring", "Tools", "Mindset", "Productivity"]}
-      - {label: "Featured Image", name: "thumbnail", widget: "image", required: false, hint: "Upload a cover image for your blog post"}
-      - {label: "Short Description", name: "excerpt", widget: "text", hint: "A short 1-2 sentence summary shown on the blog page"}
-      - {label: "Blog Content", name: "body", widget: "markdown", hint: "Write your full blog post here"}
-      - {label: "SEO Title", name: "seo_title", widget: "string", required: false, hint: "Leave blank to use the post title"}
-      - {label: "SEO Description", name: "seo_description", widget: "text", required: false, hint: "Short description for Google search results (150-160 characters)"}
+      - label: Title
+        name: title
+        widget: string
+      - label: Publish Date
+        name: date
+        widget: datetime
+      - label: Category
+        name: category
+        widget: select
+        options:
+          - Executive Assistant Tips
+          - Calendar Strategy
+          - Operations
+          - Travel
+          - Hiring
+          - Tools
+          - Mindset
+          - Productivity
+      - label: Featured Image
+        name: thumbnail
+        widget: image
+        required: false
+      - label: Short Description
+        name: excerpt
+        widget: text
+      - label: Blog Content
+        name: body
+        widget: markdown
+      - label: SEO Description
+        name: seo_description
+        widget: text
+        required: false
