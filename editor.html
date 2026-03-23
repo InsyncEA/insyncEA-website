@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Editor | InSyncEA</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#1B3A2D;--green2:#2D6A4F;--sage:#52B788;
+  --white:#FDFAF5;--border:#E2D9CB;--soft:#7A7A74;--warm:#EDE5D8;
+}
+body{font-family:'Jost',sans-serif;background:#F0EDE6;color:#1C1C18;min-height:100vh}
+
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--green)}
+.login-box{background:var(--white);padding:56px 48px;width:100%;max-width:420px;text-align:center}
+.logo{font-family:'Cormorant Garamond',serif;font-size:36px;color:var(--green);margin-bottom:4px}
+.logo em{color:var(--sage);font-style:italic}
+.logo-sub{font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--soft);margin-bottom:40px;display:block}
+.login-box input{width:100%;padding:14px 16px;border:1px solid var(--border);font-family:'Jost',sans-serif;font-size:13px;font-weight:300;margin-bottom:12px;outline:none;background:var(--white);color:#1C1C18}
+.login-box input:focus{border-color:var(--green)}
+.login-btn{width:100%;padding:15px;background:var(--green);color:white;border:none;font-family:'Jost',sans-serif;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;font-weight:500;margin-top:4px;transition:background 0.2s}
+.login-btn:hover{background:var(--green2)}
+.login-err{color:#B22222;font-size:12px;margin-top:12px;display:none;font-weight:300}
+
+/* MAIN EDITOR */
+#editor-screen{display:none;min-height:100vh}
+.topbar{background:var(--green);height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:fixed;top:0;left:0;right:0;z-index:100}
+.topbar-logo{font-family:'Cormorant Garamond',serif;font-size:22px;color:white}
+.topbar-logo em{color:var(--sage)}
+.topbar-right{display:flex;align-items:center;gap:20px}
+.topbar-site{font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:0.08em}
+.logout-btn{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.5);cursor:pointer;border:1px solid rgba(255,255,255,0.2);padding:6px 14px;background:none;font-family:'Jost',sans-serif;transition:all 0.2s}
+.logout-btn:hover{color:white;border-color:rgba(255,255,255,0.5)}
+
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh;padding-top:60px}
+
+/* SIDEBAR */
+.sidebar{background:white;border-right:1px solid var(--border);padding:32px 0;position:fixed;top:60px;left:0;bottom:0;width:240px;overflow-y:auto}
+.sb-section{margin-bottom:8px}
+.sb-label{font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--soft);padding:0 24px;margin-bottom:6px;font-weight:500}
+.sb-item{display:block;padding:10px 24px;font-size:13px;font-weight:300;color:#3A3A36;cursor:pointer;transition:all 0.15s;border:none;background:none;width:100%;text-align:left;font-family:'Jost',sans-serif}
+.sb-item:hover{background:var(--warm);color:var(--green)}
+.sb-item.active{background:var(--green);color:white;font-weight:400}
+.sb-divider{height:1px;background:var(--border);margin:12px 24px}
+
+/* CONTENT AREA */
+.content{margin-left:240px;padding:48px;min-height:calc(100vh - 60px)}
+.panel{display:none}
+.panel.active{display:block}
+.panel-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:400;color:var(--green);margin-bottom:4px}
+.panel-sub{font-size:12px;color:var(--soft);font-weight:300;margin-bottom:40px;letter-spacing:0.04em}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:900px}
+.form-grid.single{grid-template-columns:1fr;max-width:700px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:span 2}
+.field label{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--green);font-weight:500}
+.field input,.field textarea,.field select{font-family:'Jost',sans-serif;font-size:13px;font-weight:300;padding:12px 14px;border:1px solid var(--border);background:white;color:#1C1C18;outline:none;transition:border 0.2s;resize:vertical}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--green)}
+.field textarea{min-height:120px;line-height:1.7}
+.field-hint{font-size:11px;color:var(--soft);font-weight:300}
+
+/* BLOG LIST */
+.post-list{max-width:900px}
+.post-item{background:white;border:1px solid var(--border);padding:20px 24px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;transition:border-color 0.2s}
+.post-item:hover{border-color:var(--green)}
+.pi-info{}
+.pi-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--green);font-weight:400;margin-bottom:4px}
+.pi-meta{font-size:11px;color:var(--soft);font-weight:300;letter-spacing:0.04em}
+.pi-actions{display:flex;gap:10px}
+.btn{padding:8px 18px;font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;cursor:pointer;border:none;font-weight:500;transition:all 0.2s}
+.btn-primary{background:var(--green);color:white}
+.btn-primary:hover{background:var(--green2)}
+.btn-secondary{background:transparent;color:var(--green);border:1px solid var(--green)}
+.btn-secondary:hover{background:var(--green);color:white}
+.btn-danger{background:transparent;color:#B22222;border:1px solid #E2C2C2}
+.btn-danger:hover{background:#B22222;color:white}
+.btn-lg{padding:14px 32px;font-size:11px}
+
+/* NEW POST */
+.post-editor{max-width:900px}
+.post-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
+.post-toolbar h2{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--green);font-weight:400}
+
+/* RICH TEXT */
+.rich-toolbar{display:flex;gap:4px;padding:8px;background:var(--warm);border:1px solid var(--border);border-bottom:none;flex-wrap:wrap}
+.rich-btn{padding:4px 10px;font-family:'Jost',sans-serif;font-size:11px;cursor:pointer;border:1px solid transparent;background:none;color:var(--green);font-weight:500;transition:all 0.15s}
+.rich-btn:hover{background:white;border-color:var(--border)}
+.rich-area{width:100%;min-height:400px;padding:20px;border:1px solid var(--border);font-family:'Jost',sans-serif;font-size:14px;font-weight:300;line-height:1.9;outline:none;background:white;color:#1C1C18}
+.rich-area:focus{border-color:var(--green)}
+
+/* SAVE BAR */
+.save-bar{position:fixed;bottom:0;left:240px;right:0;background:white;border-top:1px solid var(--border);padding:16px 48px;display:flex;justify-content:space-between;align-items:center;z-index:50}
+.save-status{font-size:12px;color:var(--soft);font-weight:300}
+.save-status.saved{color:var(--sage)}
+.save-status.unsaved{color:#B8860B}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;right:32px;background:var(--green);color:white;padding:14px 24px;font-size:12px;font-weight:400;letter-spacing:0.06em;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:200}
+.toast.show{opacity:1}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .content{margin-left:0;padding:24px}
+  .form-grid{grid-template-columns:1fr}
+  .field.full{grid-column:span 1}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="logo">InSync<em>EA</em></div>
+    <span class="logo-sub">Content Editor</span>
+    <input type="password" id="pwd-input" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="login-err">Incorrect password. Please try again.</div>
+  </div>
+</div>
+
+<!-- EDITOR -->
+<div id="editor-screen">
+  <div class="topbar">
+    <div class="topbar-logo">InSync<em>EA</em></div>
+    <div class="topbar-right">
+      <span class="topbar-site">Content Editor</span>
+      <button class="logout-btn" onclick="doLogout()">Log Out</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sb-section">
+        <div class="sb-label">Blog</div>
+        <button class="sb-item active" onclick="showPanel('blog-list')">All Posts</button>
+        <button class="sb-item" onclick="showPanel('new-post')">Write New Post</button>
+      </div>
+      <div class="sb-divider"></div>
+      <div class="sb-section">
+        <div class="sb-label">Website Content</div>
+        <button class="sb-item" onclick="showPanel('homepage')">Homepage</button>
+        <button class="sb-item" onclick="showPanel('about')">About Page</button>
+        <button class="sb-item" onclick="showPanel('services')">Services</button>
+        <button class="sb-item" onclick="showPanel('contact')">Contact Details</button>
+      </div>
+      <div class="sb-divider"></div>
+      <div class="sb-section">
+        <div class="sb-label">Site</div>
+        <button class="sb-item" onclick="window.open('/', '_blank')">View Website ↗</button>
+      </div>
+    </div>
+
+    <!-- PANELS -->
+    <div class="content">
+
+      <!-- BLOG LIST -->
+      <div class="panel active" id="panel-blog-list">
+        <div class="panel-title">Blog Posts</div>
+        <div class="panel-sub">All your published and draft posts</div>
+        <div style="margin-bottom:24px"><button class="btn btn-primary btn-lg" onclick="showPanel('new-post')">+ Write New Post</button></div>
+        <div class="post-list" id="post-list-container">
+          <div style="padding:40px;text-align:center;color:var(--soft);font-size:13px;background:white;border:1px solid var(--border)">
+            No posts yet. Click "Write New Post" to get started.
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW / EDIT POST -->
+      <div class="panel" id="panel-new-post">
+        <div class="post-toolbar">
+          <h2 id="post-editor-title">Write New Post</h2>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-secondary" onclick="showPanel('blog-list')">Cancel</button>
+            <button class="btn btn-primary" onclick="savePost()">Save Post</button>
+          </div>
+        </div>
+        <div class="form-grid" style="margin-bottom:24px">
+          <div class="field full">
+            <label>Post Title</label>
+            <input type="text" id="post-title" placeholder="e.g. 5 Signs You Need an Executive Assistant">
+          </div>
+          <div class="field">
+            <label>Category</label>
+            <select id="post-category">
+              <option>Executive Assistant Tips</option>
+              <option>Calendar Strategy</option>
+              <option>Operations</option>
+              <option>Travel</option>
+              <option>Hiring</option>
+              <option>Tools</option>
+              <option>Mindset</option>
+              <option>Productivity</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Publish Date</label>
+            <input type="date" id="post-date">
+          </div>
+          <div class="field full">
+            <label>Short Description</label>
+            <textarea id="post-excerpt" style="min-height:80px" placeholder="A 1-2 sentence summary shown on the blog page"></textarea>
+          </div>
+          <div class="field full">
+            <label>SEO Description</label>
+            <textarea id="post-seo" style="min-height:60px" placeholder="Description for Google search results (150-160 characters)"></textarea>
+          </div>
+        </div>
+        <div class="field" style="max-width:900px;margin-bottom:80px">
+          <label>Blog Content</label>
+          <div class="rich-toolbar">
+            <button class="rich-btn" onclick="fmt('bold')"><b>B</b></button>
+            <button class="rich-btn" onclick="fmt('italic')"><i>I</i></button>
+            <button class="rich-btn" onclick="fmt('underline')"><u>U</u></button>
+            <button class="rich-btn" onclick="fmtBlock('h2')">H2</button>
+            <button class="rich-btn" onclick="fmtBlock('h3')">H3</button>
+            <button class="rich-btn" onclick="fmt('insertUnorderedList')">• List</button>
+            <button class="rich-btn" onclick="fmt('insertOrderedList')">1. List</button>
+            <button class="rich-btn" onclick="addLink()">Link</button>
+            <button class="rich-btn" onclick="fmt('removeFormat')">Clear</button>
+          </div>
+          <div class="rich-area" id="post-body" contenteditable="true" spellcheck="true" placeholder="Write your blog post here..."></div>
+        </div>
+      </div>
+
+      <!-- HOMEPAGE -->
+      <div class="panel" id="panel-homepage">
+        <div class="panel-title">Homepage</div>
+        <div class="panel-sub">Edit the text and content on your homepage</div>
+        <div class="form-grid" style="margin-bottom:80px">
+          <div class="field full">
+            <label>Hero Eyebrow Text</label>
+            <input type="text" id="hp-eyebrow" placeholder="e.g. Executive Assistant · Operations Specialist">
+            <span class="field-hint">Small text above the main headline</span>
+          </div>
+          <div class="field full">
+            <label>Main Headline</label>
+            <input type="text" id="hp-headline" placeholder="e.g. The calm behind every great leader">
+          </div>
+          <div class="field full">
+            <label>Headline Subtext</label>
+            <textarea id="hp-subtext" placeholder="The paragraph below your headline"></textarea>
+          </div>
+          <div class="field">
+            <label>Stat — Hours Saved</label>
+            <input type="text" id="hp-stat1" placeholder="e.g. 500+">
+          </div>
+          <div class="field">
+            <label>Stat — Client Satisfaction</label>
+            <input type="text" id="hp-stat2" placeholder="e.g. 98%">
+          </div>
+          <div class="field">
+            <label>Stat — Clients Supported</label>
+            <input type="text" id="hp-stat3" placeholder="e.g. 15+">
+          </div>
+          <div class="field full">
+            <label>Testimonial Quote</label>
+            <textarea id="hp-quote" placeholder="The testimonial quote shown on the homepage"></textarea>
+          </div>
+          <div class="field full">
+            <label>Testimonial Attribution</label>
+            <input type="text" id="hp-attr" placeholder="e.g. Founder, Elevate Studios">
+          </div>
+        </div>
+      </div>
+
+      <!-- ABOUT -->
+      <div class="panel" id="panel-about">
+        <div class="panel-title">About Page</div>
+        <div class="panel-sub">Edit your bio and about page content</div>
+        <div class="form-grid" style="margin-bottom:80px">
+          <div class="field full">
+            <label>Your Role / Title</label>
+            <input type="text" id="ab-role" placeholder="e.g. Executive Assistant & Operations Specialist">
+          </div>
+          <div class="field full">
+            <label>Availability Status</label>
+            <input type="text" id="ab-availability" placeholder="e.g. Currently accepting new clients">
+          </div>
+          <div class="field full">
+            <label>Bio — Paragraph 1</label>
+            <textarea id="ab-bio1"></textarea>
+          </div>
+          <div class="field full">
+            <label>Bio — Paragraph 2</label>
+            <textarea id="ab-bio2"></textarea>
+          </div>
+          <div class="field full">
+            <label>Bio — Paragraph 3</label>
+            <textarea id="ab-bio3"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- SERVICES -->
+      <div class="panel" id="panel-services">
+        <div class="panel-title">Services</div>
+        <div class="panel-sub">Edit your service descriptions</div>
+        <div id="services-list" style="max-width:900px;margin-bottom:80px"></div>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="panel" id="panel-contact">
+        <div class="panel-title">Contact Details</div>
+        <div class="panel-sub">Update your contact information</div>
+        <div class="form-grid single" style="margin-bottom:80px">
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="ct-email" placeholder="hello@insync-ea.com">
+          </div>
+          <div class="field">
+            <label>LinkedIn URL</label>
+            <input type="text" id="ct-linkedin" placeholder="linkedin.com/in/yourprofile">
+          </div>
+          <div class="field">
+            <label>Response Time</label>
+            <input type="text" id="ct-response" placeholder="e.g. Within 24 hours, always">
+          </div>
+          <div class="field">
+            <label>Availability Message</label>
+            <textarea id="ct-message" placeholder="The paragraph shown on your contact page"></textarea>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end content -->
+  </div><!-- end layout -->
+
+  <!-- SAVE BAR -->
+  <div class="save-bar" id="save-bar" style="display:none">
+    <span class="save-status unsaved" id="save-status">Unsaved changes</span>
+    <div style="display:flex;gap:12px">
+      <button class="btn btn-secondary" onclick="discardChanges()">Discard</button>
+      <button class="btn btn-primary btn-lg" onclick="saveCurrentPanel()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── PASSWORD ──────────────────────────────────────────────────────────────
+const PASSWORD = 'InSyncEA2025!';
+
+function doLogin(){
+  const pwd = document.getElementById('pwd-input').value;
+  if(pwd === PASSWORD){
+    sessionStorage.setItem('ea-auth','1');
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('editor-screen').style.display='block';
+    loadAllData();
+  } else {
+    document.getElementById('login-err').style.display='block';
+    document.getElementById('pwd-input').value='';
+  }
+}
+
+function doLogout(){
+  sessionStorage.removeItem('ea-auth');
+  location.reload();
+}
+
+// Check if already logged in
+if(sessionStorage.getItem('ea-auth')==='1'){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('editor-screen').style.display='block';
+  loadAllData();
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+let currentPanel = 'blog-list';
+
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  const panel = document.getElementById('panel-'+id);
+  if(panel) panel.classList.add('active');
+  event && event.target && event.target.classList.add('active');
+  currentPanel = id;
+  if(id==='new-post'){
+    clearPostForm();
+    document.getElementById('post-editor-title').textContent='Write New Post';
+    document.getElementById('post-date').value = new Date().toISOString().split('T')[0];
+  }
+  if(id!=='new-post') hideSaveBar();
+}
+
+// ── LOCAL STORAGE DATA ────────────────────────────────────────────────────
+function save(key, data){ localStorage.setItem('insyncEA_'+key, JSON.stringify(data)); }
+function load(key){ try{ return JSON.parse(localStorage.getItem('insyncEA_'+key))||null; }catch(e){ return null; } }
+
+// ── LOAD ALL DATA ─────────────────────────────────────────────────────────
+function loadAllData(){
+  // Homepage
+  const hp = load('homepage') || {};
+  setVal('hp-eyebrow', hp.eyebrow || 'Executive Assistant · Operations Specialist');
+  setVal('hp-headline', hp.headline || 'The calm behind every great leader');
+  setVal('hp-subtext', hp.subtext || '');
+  setVal('hp-stat1', hp.stat1 || '500+');
+  setVal('hp-stat2', hp.stat2 || '98%');
+  setVal('hp-stat3', hp.stat3 || '15+');
+  setVal('hp-quote', hp.quote || '');
+  setVal('hp-attr', hp.attr || '');
+
+  // About
+  const ab = load('about') || {};
+  setVal('ab-role', ab.role || 'Executive Assistant & Operations Specialist');
+  setVal('ab-availability', ab.availability || 'Currently accepting new clients');
+  setVal('ab-bio1', ab.bio1 || '');
+  setVal('ab-bio2', ab.bio2 || '');
+  setVal('ab-bio3', ab.bio3 || '');
+
+  // Contact
+  const ct = load('contact') || {};
+  setVal('ct-email', ct.email || 'hello@insync-ea.com');
+  setVal('ct-linkedin', ct.linkedin || '');
+  setVal('ct-response', ct.response || 'Within 24 hours, always');
+  setVal('ct-message', ct.message || '');
+
+  // Posts
+  renderPostList();
+
+  // Watch changes
+  watchChanges();
+}
+
+function setVal(id, val){
+  const el = document.getElementById(id);
+  if(el) el.value = val;
+}
+
+// ── WATCH FOR CHANGES ─────────────────────────────────────────────────────
+function watchChanges(){
+  document.querySelectorAll('input,textarea,select').forEach(el=>{
+    el.addEventListener('input', ()=>{
+      if(currentPanel !== 'blog-list'){
+        showSaveBar();
+      }
+    });
+  });
+}
+
+function showSaveBar(){
+  document.getElementById('save-bar').style.display='flex';
+  document.getElementById('save-status').textContent='Unsaved changes';
+  document.getElementById('save-status').className='save-status unsaved';
+}
+function hideSaveBar(){ document.getElementById('save-bar').style.display='none'; }
+
+function discardChanges(){ loadAllData(); hideSaveBar(); }
+
+// ── SAVE CURRENT PANEL ────────────────────────────────────────────────────
+function saveCurrentPanel(){
+  if(currentPanel==='homepage') saveHomepage();
+  else if(currentPanel==='about') saveAbout();
+  else if(currentPanel==='contact') saveContact();
+  hideSaveBar();
+  showToast('Changes saved successfully');
+}
+
+function saveHomepage(){
+  save('homepage',{
+    eyebrow: getVal('hp-eyebrow'),
+    headline: getVal('hp-headline'),
+    subtext: getVal('hp-subtext'),
+    stat1: getVal('hp-stat1'),
+    stat2: getVal('hp-stat2'),
+    stat3: getVal('hp-stat3'),
+    quote: getVal('hp-quote'),
+    attr: getVal('hp-attr'),
+  });
+}
+
+function saveAbout(){
+  save('about',{
+    role: getVal('ab-role'),
+    availability: getVal('ab-availability'),
+    bio1: getVal('ab-bio1'),
+    bio2: getVal('ab-bio2'),
+    bio3: getVal('ab-bio3'),
+  });
+}
+
+function saveContact(){
+  save('contact',{
+    email: getVal('ct-email'),
+    linkedin: getVal('ct-linkedin'),
+    response: getVal('ct-response'),
+    message: getVal('ct-message'),
+  });
+}
+
+function getVal(id){
+  const el = document.getElementById(id);
+  return el ? el.value : '';
+}
+
+// ── BLOG POSTS ────────────────────────────────────────────────────────────
+let posts = [];
+let editingPostIndex = -1;
+
+function renderPostList(){
+  posts = load('posts') || [];
+  const container = document.getElementById('post-list-container');
+  if(posts.length === 0){
+    container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--soft);font-size:13px;background:white;border:1px solid var(--border)">No posts yet. Click "Write New Post" to get started.</div>';
+    return;
+  }
+  container.innerHTML = posts.map((p,i) => `
+    <div class="post-item">
+      <div class="pi-info">
+        <div class="pi-title">${p.title || 'Untitled Post'}</div>
+        <div class="pi-meta">${p.category || ''} &nbsp;·&nbsp; ${p.date || ''}</div>
+      </div>
+      <div class="pi-actions">
+        <button class="btn btn-secondary" onclick="editPost(${i})">Edit</button>
+        <button class="btn btn-danger" onclick="deletePost(${i})">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function clearPostForm(){
+  setVal('post-title','');
+  setVal('post-category','Executive Assistant Tips');
+  setVal('post-date', new Date().toISOString().split('T')[0]);
+  setVal('post-excerpt','');
+  setVal('post-seo','');
+  document.getElementById('post-body').innerHTML = '';
+  editingPostIndex = -1;
+}
+
+function editPost(index){
+  const p = posts[index];
+  editingPostIndex = index;
+  document.getElementById('post-editor-title').textContent = 'Edit Post';
+  setVal('post-title', p.title || '');
+  setVal('post-category', p.category || 'Executive Assistant Tips');
+  setVal('post-date', p.date || '');
+  setVal('post-excerpt', p.excerpt || '');
+  setVal('post-seo', p.seo || '');
+  document.getElementById('post-body').innerHTML = p.body || '';
+  showPanel('new-post');
+  document.getElementById('panel-new-post').classList.add('active');
+}
+
+function deletePost(index){
+  if(!confirm('Are you sure you want to delete this post?')) return;
+  posts.splice(index, 1);
+  save('posts', posts);
+  renderPostList();
+  showToast('Post deleted');
+}
+
+function savePost(){
+  const title = getVal('post-title').trim();
+  if(!title){ alert('Please add a title for your post'); return; }
+  const post = {
+    title: title,
+    category: getVal('post-category'),
+    date: getVal('post-date'),
+    excerpt: getVal('post-excerpt'),
+    seo: getVal('post-seo'),
+    body: document.getElementById('post-body').innerHTML,
+    savedAt: new Date().toISOString(),
+  };
+  if(editingPostIndex >= 0){
+    posts[editingPostIndex] = post;
+  } else {
+    posts.unshift(post);
+  }
+  save('posts', posts);
+  renderPostList();
+  showPanel('blog-list');
+  document.getElementById('panel-blog-list').classList.add('active');
+  showToast('Post saved successfully');
+}
+
+// ── RICH TEXT ─────────────────────────────────────────────────────────────
+function fmt(cmd){ document.execCommand(cmd, false, null); }
+function fmtBlock(tag){ document.execCommand('formatBlock', false, tag); }
+function addLink(){
+  const url = prompt('Enter URL:');
+  if(url) document.execCommand('createLink', false, url);
+}
+
+// ── SERVICES ──────────────────────────────────────────────────────────────
+const defaultServices = [
+  'Calendar & Schedule Management',
+  'Communication & Email Management',
+  'Travel & Logistics',
+  'Project & Task Management',
+  'Financial & Administrative Support',
+  'Meeting Preparation & Follow-Up',
+  'Research & Reporting',
+  'Document & File Management',
+  'Client Relationship Management',
+  'Technology & Tools Support',
+  'Personal Assistance',
+  'Shopify Store Management',
+  'Onboarding & HR Support',
+  'Strategic & Ad-Hoc Support',
+];
+
+function loadServices(){
+  const services = load('services') || defaultServices.map(s=>({name:s, desc:''}));
+  const container = document.getElementById('services-list');
+  container.innerHTML = services.map((s,i)=>`
+    <div style="background:white;border:1px solid var(--border);padding:20px 24px;margin-bottom:10px">
+      <div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--green);margin-bottom:10px;font-weight:500">Service ${i+1}</div>
+      <div class="field" style="margin-bottom:12px">
+        <label>Service Name</label>
+        <input type="text" value="${s.name}" onchange="updateService(${i},'name',this.value)">
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <textarea onchange="updateService(${i},'desc',this.value)">${s.desc||''}</textarea>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateService(i, field, val){
+  const services = load('services') || defaultServices.map(s=>({name:s, desc:''}));
+  services[i][field] = val;
+  save('services', services);
+  showToast('Service updated');
+}
+
+// Load services when panel opens
+document.querySelector('[onclick="showPanel(\'services\')"]').addEventListener('click', ()=>{
+  setTimeout(loadServices, 50);
+});
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// ── SET DATE DEFAULT ──────────────────────────────────────────────────────
+document.getElementById('post-date').value = new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>
