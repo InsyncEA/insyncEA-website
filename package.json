@@ -5,6 +5,7 @@
     "build": "tinacms build"
   },
   "dependencies": {
-    "tinacms": "^2.6.2"
+    "tinacms": "^2.6.2",
+    "@tinacms/cli": "^1.6.6"
   }
 }
