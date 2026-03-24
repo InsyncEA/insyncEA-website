@@ -1,0 +1,10 @@
+{
+  "name": "insyncea-website",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tinacms build"
+  },
+  "dependencies": {
+    "tinacms": "^2.6.2"
+  }
+}

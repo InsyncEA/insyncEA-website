@@ -1,8 +1,13 @@
 [build]
   publish = "."
+  command = "npx tinacms build"
 
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from = "/admin"
+  to = "/admin/index.html"
   status = 200
-  force = false
+
+[[redirects]]
+  from = "/admin/"
+  to = "/admin/index.html"
+  status = 200
