@@ -1,6 +1,6 @@
 ---
 title: "Welcome to the InSyncEA Blog"
-date: 2025-03-21
+date: 2026-03-21
 category: "Executive Assistant Tips"
 excerpt: "Welcome to the InSyncEA blog — your go-to resource for executive productivity, delegation strategies, and insights from a professional Executive Assistant."
 seo_title: "Welcome to the InSyncEA Blog | Executive Assistant Tips"
@@ -11,7 +11,7 @@ Welcome to the InSyncEA blog. This is your space for honest, practical insights 
 
 ## What you will find here
 
-Every post on this blog comes from real experience working with executives, founders, and business owners. No fluff — just practical advice you can use right away.
+Every post on this blog comes from real experience working with executives, founders, and business owners. No fluff, just practical advice you can use right away.
 
 Here is what to expect:
 
